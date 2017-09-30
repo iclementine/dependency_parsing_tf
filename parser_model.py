@@ -91,7 +91,7 @@ class ParserModel(Model):
 
 
     def add_cube_prediction_op(self):
-        print "***Building network with CUBE activation***"
+        print("***Building network with CUBE activation***")
         _, word_embeddings, pos_embeddings, dep_embeddings = self.add_embedding()
 
         with tf.variable_scope("layer_connections"):
@@ -144,23 +144,24 @@ class ParserModel(Model):
                                                 0.01, trainable=True)
                 h2 = tf.nn.relu(tf.add(tf.matmul(h1, w2), b2), name="activations")
 
-            with tf.variable_scope("layer_3"):
-                """
-                w3 = xavier_initializer((self.config.l2_hidden_size, self.config.num_classes), "w3")
-                b3 = xavier_initializer((self.config.num_classes,), "bias3")
-                """
+            #with tf.variable_scope("layer_3"):
+                #"""
+                #w3 = xavier_initializer((self.config.l2_hidden_size, self.config.num_classes), "w3")
+                #b3 = xavier_initializer((self.config.num_classes,), "bias3")
+                #"""
 
-                w3 = random_uniform_initializer((self.config.l2_hidden_size, self.config.num_classes), "w3",
-                                                0.01, trainable=True)
-                b3 = random_uniform_initializer((self.config.num_classes,), "bias3", 0.01, trainable=True)
+                #w3 = random_uniform_initializer((self.config.l2_hidden_size, self.config.num_classes), "w3",
+                                                #0.01, trainable=True)
+                #b3 = random_uniform_initializer((self.config.num_classes,), "bias3", 0.01, trainable=True)
         with tf.variable_scope("predictions"):
-            predictions = tf.add(tf.matmul(h2, w3), b3, name="prediction_logits")
+            #predictions = tf.add(tf.matmul(h2, w3), b3, name="prediction_logits")
+            predictions  = tf.add(tf.matmul(h1, w2), b2, name="prediction_logits")
 
         return predictions
 
 
     def add_prediction_op(self):
-        print "***Building network with ReLU activation***"
+        print("***Building network with ReLU activation***")
         x = self.add_embedding()
 
         with tf.variable_scope("layer_connections"):
@@ -214,11 +215,12 @@ class ParserModel(Model):
 
     def add_training_op(self, loss):
         with tf.variable_scope("optimizer"):
-            tvars = tf.trainable_variables()
-            grads = tf.gradients(loss, tvars)
-            grad_tvars = zip(grads, tvars)
-            self.write_gradient_summaries(grad_tvars)
             optimizer = tf.train.AdamOptimizer(learning_rate=self.config.lr, name="adam_optimizer")
+            tvars = tf.trainable_variables()
+            # grads = tf.gradients(loss, tvars)
+            # grad_tvars = zip(grads, tvars)
+            grad_tvars = optimizer.compute_gradients(loss, tvars)
+            self.write_gradient_summaries(grad_tvars)
             train_op = optimizer.apply_gradients(grad_tvars)
 
         return train_op
@@ -324,7 +326,7 @@ class ParserModel(Model):
         prog = Progbar(target=1 + len(dataset.train_inputs[0]) / config.batch_size)
         for i, (train_x, train_y) in enumerate(get_minibatches([dataset.train_inputs, dataset.train_targets],
                                                                config.batch_size, is_multi_feature_input=True)):
-            # print "input, outout: {}, {}".format(np.array(train_x).shape, np.array(train_y).shape)
+            # print("input, outout: {}, {}".format(np.array(train_x).shape, np.array(train_y).shape))
 
             summary, loss = self.train_on_batch(sess, train_x, train_y, merged)
             prog.update(i + 1, [("train loss", loss)])
@@ -333,17 +335,17 @@ class ParserModel(Model):
 
 
     def run_valid_epoch(self, sess, dataset):
-        print "Evaluating on dev set",
+        print("Evaluating on dev set",)
         self.compute_dependencies(sess, dataset.valid_data, dataset)
         valid_UAS = self.get_UAS(dataset.valid_data)
-        print "- dev UAS: {:.2f}".format(valid_UAS * 100.0)
+        print("- dev UAS: {:.2f}".format(valid_UAS * 100.0))
         return valid_UAS
 
 
     def fit(self, sess, saver, config, dataset, train_writer, valid_writer, merged):
         best_valid_UAS = 0
         for epoch in range(config.n_epochs):
-            print "Epoch {:} out of {:}".format(epoch + 1, self.config.n_epochs)
+            print("Epoch {:} out of {:}".format(epoch + 1, self.config.n_epochs))
 
             summary, loss = self.run_epoch(sess, config, dataset, train_writer, merged)
 
@@ -354,7 +356,7 @@ class ParserModel(Model):
                 if valid_UAS > best_valid_UAS:
                     best_valid_UAS = valid_UAS
                     if saver:
-                        print "New best dev UAS! Saving model.."
+                        print("New best dev UAS! Saving model..")
                         saver.save(sess, os.path.join(DataConfig.data_dir_path, DataConfig.model_dir,
                                                       DataConfig.model_name))
 
@@ -366,34 +368,34 @@ class ParserModel(Model):
 
 
 def highlight_string(temp):
-    print 80 * "="
-    print temp
-    print 80 * "="
+    print(80 * "=")
+    print(temp)
+    print(80 * "=")
 
 
 def main(flag, load_existing_dump=False):
     highlight_string("INITIALIZING")
-    print "loading data.."
+    print("loading data..")
 
     dataset = load_datasets(load_existing_dump)
     config = dataset.model_config
 
-    print "word vocab Size: {}".format(len(dataset.word2idx))
-    print "pos vocab Size: {}".format(len(dataset.pos2idx))
-    print "dep vocab Size: {}".format(len(dataset.dep2idx))
-    print "Training Size: {}".format(len(dataset.train_inputs[0]))
-    print "valid data Size: {}".format(len(dataset.valid_data))
-    print "test data Size: {}".format(len(dataset.test_data))
+    print("word vocab Size: {}".format(len(dataset.word2idx)))
+    print("pos vocab Size: {}".format(len(dataset.pos2idx)))
+    print("dep vocab Size: {}".format(len(dataset.dep2idx)))
+    print("Training Size: {}".format(len(dataset.train_inputs[0])))
+    print("valid data Size: {}".format(len(dataset.valid_data)))
+    print("test data Size: {}".format(len(dataset.test_data)))
 
-    print len(dataset.word2idx), len(dataset.word_embedding_matrix)
-    print len(dataset.pos2idx), len(dataset.pos_embedding_matrix)
-    print len(dataset.dep2idx), len(dataset.dep_embedding_matrix)
+    print(len(dataset.word2idx), len(dataset.word_embedding_matrix))
+    print(len(dataset.pos2idx), len(dataset.pos_embedding_matrix))
+    print(len(dataset.dep2idx), len(dataset.dep_embedding_matrix))
 
     if not os.path.exists(os.path.join(DataConfig.data_dir_path, DataConfig.model_dir)):
         os.makedirs(os.path.join(DataConfig.data_dir_path, DataConfig.model_dir))
 
     with tf.Graph().as_default(), tf.Session() as sess:
-        print "Building network...",
+        print("Building network...",)
         start = time.time()
         with tf.variable_scope("model") as model_scope:
             model = ParserModel(config, dataset.word_embedding_matrix, dataset.pos_embedding_matrix,
@@ -407,7 +409,7 @@ def main(flag, load_existing_dump=False):
                 -> https://stackoverflow.com/questions/35919020/whats-the-difference-of-name-scope-and-a-variable-scope-in-tensorflow
             """
 
-        print "took {:.2f} seconds\n".format(time.time() - start)
+        print("took {:.2f} seconds".format(time.time() - start))
 
         merged = tf.summary.merge_all()
         train_writer = tf.summary.FileWriter(os.path.join(DataConfig.data_dir_path, DataConfig.summary_dir,
@@ -433,12 +435,12 @@ def main(flag, load_existing_dump=False):
 
             # Testing
             highlight_string("Testing")
-            print "Restoring best found parameters on dev set"
+            print("Restoring best found parameters on dev set")
             saver.restore(sess, os.path.join(DataConfig.data_dir_path, DataConfig.model_dir,
                                              DataConfig.model_name))
             model.compute_dependencies(sess, dataset.test_data, dataset)
             test_UAS = model.get_UAS(dataset.test_data)
-            print "test UAS: {}".format(test_UAS * 100)
+            print("test UAS: {}".format(test_UAS * 100))
 
             train_writer.close()
             valid_writer.close()
@@ -449,23 +451,23 @@ def main(flag, load_existing_dump=False):
                                           [len(dataset.pos2idx.keys()), dataset.model_config.embedding_dim])
                 visualize_sample_embeddings(sess, os.path.join(DataConfig.data_dir_path, DataConfig.model_dir),
                                             dataset.pos2idx.keys(), dataset.pos2idx, pos_emb)
-            print "to Visualize Embeddings, run in terminal:"
-            print "tensorboard --logdir=" + os.path.abspath(os.path.join(DataConfig.data_dir_path,
-                                                                         DataConfig.model_dir))
+            print("to Visualize Embeddings, run in terminal:")
+            print("tensorboard --logdir=" + os.path.abspath(os.path.join(DataConfig.data_dir_path,
+                                                                         DataConfig.model_dir)))
 
         else:
             ckpt_path = tf.train.latest_checkpoint(os.path.join(DataConfig.data_dir_path,
                                                                 DataConfig.model_dir))
             if ckpt_path is not None:
-                print "Found checkpoint! Restoring variables.."
+                print("Found checkpoint! Restoring variables..")
                 saver.restore(sess, ckpt_path)
                 highlight_string("Testing")
                 model.compute_dependencies(sess, dataset.test_data, dataset)
                 test_UAS = model.get_UAS(dataset.test_data)
-                print "test UAS: {}".format(test_UAS * 100)
+                print("test UAS: {}".format(test_UAS * 100))
                 # model.run_valid_epoch(sess, dataset.valid_data, dataset)
                 # valid_UAS = model.get_UAS(dataset.valid_data)
-                # print "valid UAS: {}".format(valid_UAS * 100)
+                # print("valid UAS: {}".format(valid_UAS * 100))
 
                 highlight_string("Embedding Visualization")
                 with tf.variable_scope(model_scope, reuse=True):
@@ -473,12 +475,12 @@ def main(flag, load_existing_dump=False):
                                               [len(dataset.pos2idx.keys()), dataset.model_config.embedding_dim])
                     visualize_sample_embeddings(sess, os.path.join(DataConfig.data_dir_path, DataConfig.model_dir),
                                                 dataset.pos2idx.keys(), dataset.pos2idx, pos_emb)
-                print "to Visualize Embeddings, run in terminal:"
-                print "tensorboard --logdir=" + os.path.abspath(os.path.join(DataConfig.data_dir_path,
-                                                                             DataConfig.model_dir))
+                print("to Visualize Embeddings, run in terminal:")
+                print("tensorboard --logdir=" + os.path.abspath(os.path.join(DataConfig.data_dir_path,
+                                                                             DataConfig.model_dir)))
 
             else:
-                print "No checkpoint found!"
+                print("No checkpoint found!")
 
 
 if __name__ == '__main__':

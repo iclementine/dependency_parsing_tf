@@ -26,4 +26,13 @@ python parser_model.py
 # training dataset
 CONLL format
 
+# result
+Testing
+================================================================================
+Restoring best found parameters on dev set
+test UAS: 89.21470376012186
+to Visualize Embeddings, run in terminal:
+tensorboard --logdir=/home/clementine/projects/dependency_parsing/dependency_parsing_tf_addtran/data/params_2017-09-30
+
+
 

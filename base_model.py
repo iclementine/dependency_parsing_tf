@@ -47,12 +47,12 @@ class Model(object):
 
 
     def print_trainable_varibles(self):
-        print "\n******** Model Trainable Variables :: <name, shape> ********"
+        print("******** Model Trainable Variables :: <name, shape> ********")
         for name, shape in zip(map(lambda x: x.name, tf.trainable_variables()),
                                map(lambda x: x.get_shape(), tf.trainable_variables())):
-            print "variable: {} \t shape: {}".format(name, shape)
+            print("variable: {} \t shape: {}".format(name, shape))
 
-        print "*" * 70
+        print("*" * 70)
 
 
     def build(self):

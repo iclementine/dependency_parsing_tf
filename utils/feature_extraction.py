@@ -2,7 +2,7 @@ import os
 import numpy as np
 import datetime
 from enum import Enum
-from general_utils import get_pickle, dump_pickle, get_vocab_dict
+from utils.general_utils import get_pickle, dump_pickle, get_vocab_dict
 
 NULL = "<null>"
 UNK = "<unk>"
@@ -17,7 +17,7 @@ today_date = str(datetime.datetime.now().date())
 class DataConfig:  # data, embedding, model path etc.
     # Data Paths
     data_dir_path = "./data"
-    train_path = "dev.conll"
+    train_path = "train.conll"
     valid_path = "dev.conll"
     test_path = "test.conll"
 
@@ -55,7 +55,7 @@ class ModelConfig(object):  # Takes care of shape, dimensions used for tf model
 
     # hidden_size
     l1_hidden_size = 200
-    l2_hidden_size = 15
+    l2_hidden_size = 3
 
     # output
     num_classes = 3
@@ -66,7 +66,7 @@ class ModelConfig(object):  # Takes care of shape, dimensions used for tf model
     dep_vocab_size = None
 
     # num_epochs
-    n_epochs = 20
+    n_epochs = 10
 
     # batch_size
     batch_size = 2048
@@ -489,7 +489,7 @@ class FeatureExtractor(object):
 
 class DataReader(object):
     def __init__(self):
-        print "A"
+        print("A")
 
 
     def read_conll(self, token_lines):
@@ -534,11 +534,11 @@ def load_datasets(load_existing_dump=False):
 
     # Load data
     train_data = data_reader.read_data(train_lines)
-    print ("Loaded Train data")
+    print(("Loaded Train data"))
     valid_data = data_reader.read_data(valid_lines)
-    print ("Loaded Dev data")
+    print(("Loaded Dev data"))
     test_data = data_reader.read_data(test_lines)
-    print ("Loaded Test data")
+    print(("Loaded Test data"))
 
     feature_extractor = FeatureExtractor(model_config)
     dataset = Dataset(model_config, train_data, valid_data, test_data, feature_extractor)
@@ -553,11 +553,11 @@ def load_datasets(load_existing_dump=False):
         dataset.idx2dep = {idx: dep for (dep, idx) in dataset.dep2idx.items()}
 
         dataset.model_config.load_existing_vocab = True
-        print "loaded existing Vocab!"
+        print("loaded existing Vocab!")
         dataset.word_embedding_matrix = get_pickle(os.path.join(DataConfig.dump_dir, DataConfig.word_emb_file))
         dataset.pos_embedding_matrix = get_pickle(os.path.join(DataConfig.dump_dir, DataConfig.pos_emb_file))
         dataset.dep_embedding_matrix = get_pickle(os.path.join(DataConfig.dump_dir, DataConfig.dep_emb_file))
-        print "loaded existing embedding matrix!"
+        print("loaded existing embedding matrix!")
 
     else:
         dataset.build_vocab()
@@ -565,16 +565,16 @@ def load_datasets(load_existing_dump=False):
         dump_pickle(dataset.pos2idx, os.path.join(DataConfig.dump_dir, DataConfig.pos_vocab_file))
         dump_pickle(dataset.dep2idx, os.path.join(DataConfig.dump_dir, DataConfig.dep_vocab_file))
         dataset.model_config.load_existing_vocab = True
-        print "Vocab Build Done!"
+        print("Vocab Build Done!")
         dataset.build_embedding_matrix()
-        print "embedding matrix Build Done"
+        print("embedding matrix Build Done")
         dump_pickle(dataset.word_embedding_matrix, os.path.join(DataConfig.dump_dir, DataConfig.word_emb_file))
         dump_pickle(dataset.pos_embedding_matrix, os.path.join(DataConfig.dump_dir, DataConfig.pos_emb_file))
         dump_pickle(dataset.dep_embedding_matrix, os.path.join(DataConfig.dump_dir, DataConfig.dep_emb_file))
 
-    print "converting data into ids.."
+    print("converting data into ids..")
     dataset.convert_data_to_ids()
-    print "Done!"
+    print("Done!")
     dataset.model_config.word_features_types = len(dataset.train_inputs[0][0])
     dataset.model_config.pos_features_types = len(dataset.train_inputs[1][0])
     dataset.model_config.dep_features_types = len(dataset.train_inputs[2][0])

@@ -1,7 +1,7 @@
 import sys
 import time
 import numpy as np
-import cPickle
+import pickle
 
 
 def get_minibatches(data, minibatch_size, shuffle=True, is_multi_feature_input=False):
@@ -63,17 +63,17 @@ def test_all_close(name, actual, expected):
     if np.amax(np.fabs(actual - expected)) > 1e-6:
         raise ValueError("{:} failed, expected {:} but value is {:}".format(name, expected, actual))
     else:
-        print name, "passed!"
+        print(name, "passed!")
 
 
 def get_pickle(path):
-    data = cPickle.load(open(path, "rb"))
+    data = pickle.load(open(path, "rb"))
     return data
 
 
 def dump_pickle(data, path):
-    with open(path, "w") as f:
-        cPickle.dump(data, f)
+    with open(path, "wb") as f:
+        pickle.dump(data, f)
 
 
 def get_vocab_dict(items):
@@ -198,9 +198,9 @@ class Progbar(object):
         self.update(self.seen_so_far + n, values)
 
 # glove_dict = get_pickle("/home/asjindal/Work/tf/pkl/glove.6B.100d.pkl")
-# print len(glove_dict)
-# print glove_dict["apple"], type(glove_dict["apple"])
-# print "A"
+# print(len(glove_dict))
+# print(glove_dict["apple"], type(glove_dict["apple"]))
+# print("A")
 
 
 def make_embedding_to_pkl():
@@ -232,12 +232,12 @@ def make_embedding_to_pkl():
             else:
                 word_vectors[sp[0]] = sp[1].strip()
 
-        print "Loaded!"
+        print("Loaded!")
         dump_pickle(word_vectors, "/home/asjindal/data/embeddings_pkl/" + file[1])
-        print "Done!"
+        print("Done!")
 
 # make_embedding_to_pkl()
 
 # glove300d_pkl = get_pickle("/home/asjindal/data/embeddings_pkl/glove300d_dict.pkl")
-# print len(glove300d_pkl)
-# print glove300d_pkl["apple"], type(glove300d_pkl["apple"])
+# print(len(glove300d_pkl))
+# print(glove300d_pkl["apple"], type(glove300d_pkl["apple"]))
