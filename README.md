@@ -17,3 +17,11 @@ example: tensorboard --logdir=<base dir>/dependency_parsing_tf/data/params_2017-
 
 ## and Next
 1. will go an get the latest branch and make a python3 edition
+
+================================================================================
+Testing
+================================================================================
+Restoring best found parameters on dev set
+test UAS: 87.91369698680404
+to Visualize Embeddings, run in terminal:
+tensorboard --logdir=/home/clementine/projects/dependency_parsing/dependency_parsing_tf/data/params_2017-09-30

@@ -296,6 +296,7 @@ def main(flag, load_existing_vocab=False):
     print("pos vocab Size: {}".format(len(dataset.pos2idx)))
     print("Training Size: {}".format(len(dataset.train_inputs[0])))
     print("valid data Size: {}".format(len(dataset.valid_data)))
+    print("test data Size: {}".format(len(dataset.test_data)))
 
     if not os.path.exists(os.path.join(DataConfig.data_dir_path, DataConfig.model_dir)):
         os.makedirs(os.path.join(DataConfig.data_dir_path, DataConfig.model_dir))
